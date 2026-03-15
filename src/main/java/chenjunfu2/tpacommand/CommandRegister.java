@@ -1,5 +1,6 @@
 package chenjunfu2.tpacommand;
 
+import chenjunfu2.tpacommand.util.PlayerData;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -20,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import static chenjunfu2.tpacommand.TpaCommand.server;
+import static chenjunfu2.tpacommand.TpaCommand.minecraftServer;
 
 class PlayersWithoutSelfSuggestionProvider implements SuggestionProvider<ServerCommandSource>
 {
@@ -50,12 +51,12 @@ class PlayersWithoutSelfSuggestionProvider implements SuggestionProvider<ServerC
 	}
 }
 
-public class Command
+public class CommandRegister
 {
 	// 在类中添加静态方法
 	private final static SuggestionProvider<ServerCommandSource> SUGGEST_PLAYERS_WITHOUT_SELF = new PlayersWithoutSelfSuggestionProvider();
 	
-	public Command(CommandDispatcher<ServerCommandSource> dispatcher)
+	public static void RegisterCommand(CommandDispatcher<ServerCommandSource> dispatcher)
 	{
 		/*
 		/tpa [player]
@@ -116,14 +117,14 @@ public class Command
 	
 	private static ServerPlayerEntity Find(CommandContext<ServerCommandSource> context, ServerPlayerEntity speFind, boolean pegging)
 	{
-		var find = TPARequest.FindLatestRequest(new PlayerData(speFind),pegging);
+		var find = TpaRequest.FindLatestRequest(new PlayerData(speFind), pegging);
 		if(find == null)
 		{
 			context.getSource().sendError(Text.literal("§c你没有待决的请求！"));
 			return null;
 		}
 		
-		var target = find.getServerPlayerEntity(server);
+		var target = find.getServerPlayerEntity(minecraftServer);
 		if(target == null)
 		{
 			context.getSource().sendError(Text.literal(String.format("§c玩家%s不存在，可能已经离线！",find.getName())));
@@ -149,14 +150,14 @@ public class Command
 			return 0;
 		}
 		
-		Text msg = TPARequest.AddRequest(new PlayerData(source), new PlayerData(target), TpDirection.TPA_MODE);
+		Text msg = TpaRequest.AddRequest(new PlayerData(source), new PlayerData(target), TpDirection.TPA_MODE);
 		if (msg != null)
 		{
 			context.getSource().sendError(msg);
 			return 0;
 		}
 		
-		server.sendMessage(Text.literal(String.format("%s请求传送到%s身边",source.getName().getString(),target.getName().getString())));
+		minecraftServer.sendMessage(Text.literal(String.format("%s请求传送到%s身边", source.getName().getString(), target.getName().getString())));
 		source.sendMessage(Text.literal(String.format("§a已向%s发出传送请求", target.getName().getString())));
 		target.sendMessage(Text.literal(String.format("§e%s请求传送到你身边", source.getName().getString())));
 		
@@ -179,14 +180,14 @@ public class Command
 			return 0;
 		}
 		
-		Text msg = TPARequest.AddRequest(new PlayerData(source), new PlayerData(target), TpDirection.TPAHERE_MODE);
+		Text msg = TpaRequest.AddRequest(new PlayerData(source), new PlayerData(target), TpDirection.TPAHERE_MODE);
 		if (msg != null)
 		{
 			context.getSource().sendError(msg);
 			return 0;
 		}
 		
-		server.sendMessage(Text.literal(String.format("%s请求%s传送到他身边",source.getName().getString(),target.getName().getString())));
+		minecraftServer.sendMessage(Text.literal(String.format("%s请求%s传送到他身边", source.getName().getString(), target.getName().getString())));
 		source.sendMessage(Text.literal(String.format("§a已向%s发出传送请求", target.getName().getString())));
 		target.sendMessage(Text.literal(String.format("§e%s请求你传送到他身边", source.getName().getString())));
 		
@@ -213,13 +214,13 @@ public class Command
 			}
 		}
 		
-		if (TPARequest.RmvRequest(new PlayerData(source), new PlayerData(target)) == null)//移除自己的
+		if (TpaRequest.RmvRequest(new PlayerData(source), new PlayerData(target)) == null)//移除自己的
 		{
 			context.getSource().sendError(Text.literal("§c你不能取消不存在的请求！"));
 			return 0;
 		}
 		
-		server.sendMessage(Text.literal(String.format("%s取消了向%s发出的请求",source.getName().getString(),target.getName().getString())));
+		minecraftServer.sendMessage(Text.literal(String.format("%s取消了向%s发出的请求", source.getName().getString(), target.getName().getString())));
 		source.sendMessage(Text.literal(String.format("§a已取消向%s发出的请求", target.getName().getString())));
 		target.sendMessage(Text.literal(String.format("§e%s取消了传送请求", source.getName().getString())));
 		
@@ -254,7 +255,7 @@ public class Command
 		}
 		
 		//移除请求并获取传送方向
-		var dir = TPARequest.RmvRequest(new PlayerData(target), new PlayerData(source));
+		var dir = TpaRequest.RmvRequest(new PlayerData(target), new PlayerData(source));
 		if (dir == null)
 		{
 			context.getSource().sendError(Text.literal("§c你不能接受不存在的请求！"));
@@ -293,9 +294,9 @@ public class Command
 		from.teleport(targetWorld, to.getX(), to.getY(), to.getZ(), positionFlags, from.getYaw(), from.getPitch(),true);
 		
 		//发送消息
-		server.sendMessage(Text.literal(String.format("%s同意了%s的请求，已将%s传送到%s",
-		                                              source.getName().getString(),target.getName().getString(),
-		                                              from.getName().getString(),to.getName().getString())));
+		minecraftServer.sendMessage(Text.literal(String.format("%s同意了%s的请求，已将%s传送到%s",
+		                                                       source.getName().getString(), target.getName().getString(),
+		                                                       from.getName().getString(), to.getName().getString())));
 		from.sendMessage(Text.literal(String.format("已传送到%s身边", to.getName().getString())));
 		to.sendMessage(Text.literal(String.format("%s已传送到你身边", from.getName().getString())));
 		
@@ -322,13 +323,13 @@ public class Command
 			}
 		}
 		
-		if (TPARequest.RmvRequest(new PlayerData(target), new PlayerData(source)) == null)//移除他人的
+		if (TpaRequest.RmvRequest(new PlayerData(target), new PlayerData(source)) == null)//移除他人的
 		{
 			context.getSource().sendError(Text.literal("§c你不能拒绝不存在的请求！"));
 			return 0;
 		}
 		
-		server.sendMessage(Text.literal(String.format("%s拒绝了%s的请求",source.getName().getString(),target.getName().getString())));
+		minecraftServer.sendMessage(Text.literal(String.format("%s拒绝了%s的请求", source.getName().getString(), target.getName().getString())));
 		source.sendMessage(Text.literal(String.format("§a已拒绝%s向你发出的请求", target.getName().getString())));
 		target.sendMessage(Text.literal(String.format("§e%s拒绝了你的传送请求", source.getName().getString())));
 		

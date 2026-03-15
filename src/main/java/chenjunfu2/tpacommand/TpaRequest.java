@@ -1,25 +1,15 @@
 package chenjunfu2.tpacommand;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import chenjunfu2.tpacommand.util.PlayerData;
+import chenjunfu2.tpacommand.util.PlayerTpaData;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 
 import java.util.HashMap;
 
-import static chenjunfu2.tpacommand.TpaCommand.server;
+import static chenjunfu2.tpacommand.TpaCommand.minecraftServer;
 
-class TpaData
-{
-	Long time;
-	TpDirection direction;
-	
-	public TpaData(Long time, TpDirection direction)
-	{
-		this.time=time;
-		this.direction=direction;
-	}
-}
-
-public class TPARequest
+public class TpaRequest
 {
 	//key是发出请求的玩家，val是所有接受请求玩家，
 	//一个玩家可以给多个玩家发出请求，所以这么设计
@@ -28,7 +18,7 @@ public class TPARequest
 	//val存储一个用于查询传送的目标对象和创建时间戳
 	//要求全局单例
 	//请求表，用于记录哪些玩家发出了请求
-	private static HashMap<PlayerData, HashMap<PlayerData, TpaData>> request = new HashMap<>();
+	private static HashMap<PlayerData, HashMap<PlayerData, PlayerTpaData>> request = new HashMap<>();
 	//反查表，用于查询哪些玩家tp了自己
 	private static HashMap<PlayerData, HashMap<PlayerData,Long>> search = new HashMap<>();
 	
@@ -75,7 +65,7 @@ public class TPARequest
 		{
 			//没发过且没到上限，塞一个
 			var time = System.currentTimeMillis();
-			t.put(target,new TpaData(time, dir));
+			t.put(target,new PlayerTpaData(time, dir));
 			AddSearch(source,target,time);//加入反查表
 		}
 		else
@@ -97,7 +87,7 @@ public class TPARequest
 		}
 		
 		//移除
-		TpaData ret = t.remove(target);
+		PlayerTpaData ret = t.remove(target);
 		RmvSearch(source,target);//移出反查表
 		
 		if(t.isEmpty())//此玩家没有发给别人的request了
@@ -106,7 +96,7 @@ public class TPARequest
 			request.remove(source);
 		}
 		
-		return ret.direction;
+		return ret.getDirection();
 	}
 	
 	//pegging = true：从find查询有谁给自己发了请求
@@ -165,16 +155,16 @@ public class TPARequest
 			
 			//赋值为第一个
 			var latestEntry = it.next();
-			var latestTime = latestEntry.getValue().time;
+			var latestTime = latestEntry.getValue().getTime();
 			
 			
 			//往下找，找到一个最大的，一直替换
 			while(it.hasNext())
 			{
 				var entry = it.next();
-				if(entry.getValue().time > latestTime)
+				if(entry.getValue().getTime() > latestTime)
 				{
-					latestTime = entry.getValue().time;
+					latestTime = entry.getValue().getTime();
 					latestEntry = entry;
 				}
 			}
@@ -184,49 +174,45 @@ public class TPARequest
 		}
 	}
 	
-	public static void registerTimeoutCheck()//mod初始化注册
+	public static void requestTimeoutCheck(MinecraftServer server)//mod初始化注册
 	{
-		ServerTickEvents.END_SERVER_TICK.register(
-		server ->
+		// 每 tick 执行一次检测
+		var it = request.entrySet().iterator();
+		while (it.hasNext())
 		{
-			// 每 tick 执行一次检测
-			var it = request.entrySet().iterator();
-			while (it.hasNext())
+			var entry = it.next();
+			var it2 = entry.getValue().entrySet().iterator();
+			while(it2.hasNext())
 			{
-				var entry = it.next();
-				var it2 = entry.getValue().entrySet().iterator();
-				while(it2.hasNext())
-				{
-					var entry2 = it2.next();
-					long elapsed = System.currentTimeMillis() - entry2.getValue().time;
-					
-					if (elapsed >= TIMEOUT_MS)
-					{
-						// 执行超时处理
-						handleTimeout(entry.getKey(), entry2.getKey());
-						//从反查表删除
-						RmvSearch(entry.getKey(), entry2.getKey());
-						it2.remove();//删除请求
-					}
-				}
+				var entry2 = it2.next();
+				long elapsed = System.currentTimeMillis() - entry2.getValue().getTime();
 				
-				//如果这个玩家发给所有玩家的请求都没了，则删掉
-				if(entry.getValue().isEmpty())
+				if (elapsed >= TIMEOUT_MS)
 				{
-					it.remove();
+					// 执行超时处理
+					handleTimeout(entry.getKey(), entry2.getKey());
+					//从反查表删除
+					RmvSearch(entry.getKey(), entry2.getKey());
+					it2.remove();//删除请求
 				}
 			}
-		});
+			
+			//如果这个玩家发给所有玩家的请求都没了，则删掉
+			if(entry.getValue().isEmpty())
+			{
+				it.remove();
+			}
+		}
 	}
 	
 	private static void handleTimeout(PlayerData source,PlayerData target)
 	{
 		//获取玩家实体
-		var ps = source.getServerPlayerEntity(server);
-		var pt = target.getServerPlayerEntity(server);
+		var ps = source.getServerPlayerEntity(minecraftServer);
+		var pt = target.getServerPlayerEntity(minecraftServer);
 		
 		//服务器打印
-		server.sendMessage(Text.literal(String.format("%s发给%s的请求已超时过期",source.getName(),target.getName())));
+		minecraftServer.sendMessage(Text.literal(String.format("%s发给%s的请求已超时过期", source.getName(), target.getName())));
 		
 		// 通知双方玩家
 		if (ps != null && !ps.isDisconnected())

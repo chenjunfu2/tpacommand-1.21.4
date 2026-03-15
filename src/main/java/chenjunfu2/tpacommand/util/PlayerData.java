@@ -1,4 +1,4 @@
-package chenjunfu2.tpacommand;
+package chenjunfu2.tpacommand.util;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,9 +28,9 @@ public class PlayerData
 		return name;
 	}
 	
-	public String getUuid()
+	public UUID getUuid()
 	{
-		return name;
+		return uuid;
 	}
 	
 	public ServerPlayerEntity getServerPlayerEntity(MinecraftServer server)
