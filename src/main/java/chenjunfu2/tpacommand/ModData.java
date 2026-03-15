@@ -24,7 +24,7 @@ public class ModData
 		
 		try
 		{
-			modFolder = overworld.getServer().getSavePath(WorldSavePath.ROOT).resolve(folderName);
+			modFolder = overworld.getServer().getSavePath(WorldSavePath.PLAYERDATA).resolve(folderName);
 			
 			if (!Files.exists(modFolder))
 			{

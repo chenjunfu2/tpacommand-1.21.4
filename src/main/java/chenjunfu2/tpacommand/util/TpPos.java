@@ -1,4 +1,4 @@
-package chenjunfu2.tpacommand.home;
+package chenjunfu2.tpacommand.util;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
@@ -8,14 +8,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class HomePos
+public class TpPos
 {
 	public RegistryKey<World> dimension;
 	public Vec3d position;
 	public float yaw;
 	public float pitch;
 	
-	HomePos(RegistryKey<World> dimension, Vec3d position,float yaw,float pitch)
+	TpPos(RegistryKey<World> dimension, Vec3d position, float yaw, float pitch)
 	{
 		this.dimension=dimension;
 		this.position=position;
@@ -23,7 +23,7 @@ public class HomePos
 		this.pitch=pitch;
 	}
 	
-	HomePos()
+	public TpPos()
 	{
 		this.dimension= World.OVERWORLD;
 		this.position= new Vec3d(0.0,0.0,0.0);
@@ -31,12 +31,12 @@ public class HomePos
 		this.pitch=0.0f;
 	}
 	
-	static HomePos fromPlayer(ServerPlayerEntity serverPlayer)
+	public static TpPos fromPlayer(ServerPlayerEntity serverPlayer)
 	{
-		return new HomePos(serverPlayer.getServerWorld().getRegistryKey(), serverPlayer.getPos(),serverPlayer.getYaw(),serverPlayer.getPitch());
+		return new TpPos(serverPlayer.getServerWorld().getRegistryKey(), serverPlayer.getPos(), serverPlayer.getYaw(), serverPlayer.getPitch());
 	}
 	
-	void writeToNbt(NbtCompound w)
+	public void writeToNbt(NbtCompound w)
 	{
 		w.putString("dimension",dimension.getValue().toString());
 		
@@ -53,7 +53,7 @@ public class HomePos
 	}
 	
 	
-	void readFromNbt(NbtCompound r)
+	public void readFromNbt(NbtCompound r)
 	{
 		dimension = RegistryKey.of(RegistryKeys.WORLD, Identifier.of(r.getString("dimension")));
 		
