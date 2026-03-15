@@ -287,11 +287,11 @@ public class TpaCommand
 		
 		//进行传送
 		ServerWorld targetWorld = to.getServerWorld();
-		Set<PositionFlag> positionFlags = new HashSet<>();
-		positionFlags.add(PositionFlag.X);
-		positionFlags.add(PositionFlag.Y);
-		positionFlags.add(PositionFlag.Z);
-		from.teleport(targetWorld, to.getX(), to.getY(), to.getZ(), positionFlags, from.getYaw(), from.getPitch(),true);
+		//Set<PositionFlag> positionFlags = new HashSet<>();
+		//positionFlags.add(PositionFlag.X);
+		//positionFlags.add(PositionFlag.Y);
+		//positionFlags.add(PositionFlag.Z);
+		from.teleport(targetWorld, to.getX(), to.getY(), to.getZ(), new HashSet<>(), from.getYaw(), from.getPitch(),true);
 		
 		//发送消息
 		minecraftServer.sendMessage(Text.literal(String.format("%s同意了%s的请求，已将%s传送到%s",

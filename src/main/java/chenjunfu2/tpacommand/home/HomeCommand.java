@@ -100,16 +100,12 @@ public class HomeCommand
 			return 0;
 		}
 		
-		Set<PositionFlag> positionFlags = new HashSet<>();
-		positionFlags.add(PositionFlag.X);
-		positionFlags.add(PositionFlag.Y);
-		positionFlags.add(PositionFlag.Z);
 		serverPlayer.teleport(
 			minecraftServer.getWorld(tpPos.dimension),
 			tpPos.position.getX(),
 			tpPos.position.getY(),
 			tpPos.position.getZ(),
-			positionFlags,
+			new HashSet<>(),
 			tpPos.yaw,
 			tpPos.pitch,
 			true);
