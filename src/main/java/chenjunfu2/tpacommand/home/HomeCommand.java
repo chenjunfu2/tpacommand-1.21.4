@@ -7,15 +7,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static chenjunfu2.tpacommand.ModInit.minecraftServer;

@@ -2,6 +2,7 @@ package chenjunfu2.tpacommand;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.world.World;
@@ -23,7 +24,7 @@ public class ModData
 		
 		try
 		{
-			modFolder = overworld.getServer().getRunDirectory().resolve(folderName);
+			modFolder = overworld.getServer().getSavePath(WorldSavePath.ROOT).resolve(folderName);
 			
 			if (!Files.exists(modFolder))
 			{
