@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class TpaData
+public class ModData
 {
 	public static Path modFolder = null;
 	
@@ -45,7 +45,6 @@ public class TpaData
 			}
 			
 			System.out.println("Created mod folders at: " + modFolder);
-			
 		}
 		catch (Exception e)
 		{

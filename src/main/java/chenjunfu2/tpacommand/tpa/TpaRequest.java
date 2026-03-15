@@ -1,13 +1,11 @@
-package chenjunfu2.tpacommand;
+package chenjunfu2.tpacommand.tpa;
 
-import chenjunfu2.tpacommand.util.PlayerData;
-import chenjunfu2.tpacommand.util.PlayerTpaData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 
 import java.util.HashMap;
 
-import static chenjunfu2.tpacommand.TpaCommand.minecraftServer;
+import static chenjunfu2.tpacommand.ModInit.minecraftServer;
 
 public class TpaRequest
 {
@@ -50,7 +48,7 @@ public class TpaRequest
 	private static final long REQUEST_LIMIT = 10;
 	
 	//返回null正常，否则返回报错信息
-	public static Text AddRequest(PlayerData source, PlayerData target,TpDirection dir)
+	public static Text AddRequest(PlayerData source, PlayerData target, TpaDirection dir)
 	{
 		var t = request.computeIfAbsent(source, k -> new HashMap<>());
 		
@@ -77,7 +75,7 @@ public class TpaRequest
 	}
 	
 	//返回null失败
-	public static TpDirection RmvRequest(PlayerData source, PlayerData target)
+	public static TpaDirection RmvRequest(PlayerData source, PlayerData target)
 	{
 		//检查发送者
 		var t = request.get(source);

@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"chenjunfu2.tpacommand.TpaCommand"
+          "chenjunfu2.tpacommand.ModInit"
 		]
 	},
 	"mixins": [

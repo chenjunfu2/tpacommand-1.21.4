@@ -1,4 +1,4 @@
-package chenjunfu2.tpacommand.util;
+package chenjunfu2.tpacommand.tpa;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;

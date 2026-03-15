@@ -1,6 +1,6 @@
-package chenjunfu2.tpacommand;
+package chenjunfu2.tpacommand.tpa;
 
-public enum TpDirection
+public enum TpaDirection
 {
 	TPA_MODE,     // 对应 /tpa
 	TPAHERE_MODE  // 对应 /tpahere

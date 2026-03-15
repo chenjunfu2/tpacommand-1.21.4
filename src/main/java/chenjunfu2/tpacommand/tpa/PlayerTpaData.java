@@ -1,13 +1,11 @@
-package chenjunfu2.tpacommand.util;
-
-import chenjunfu2.tpacommand.TpDirection;
+package chenjunfu2.tpacommand.tpa;
 
 public class PlayerTpaData
 {
 	Long time;
-	TpDirection direction;
+	TpaDirection direction;
 	
-	public PlayerTpaData(Long time, TpDirection direction)
+	public PlayerTpaData(Long time, TpaDirection direction)
 	{
 		this.time = time;
 		this.direction = direction;
@@ -23,12 +21,12 @@ public class PlayerTpaData
 		this.time = time;
 	}
 	
-	public TpDirection getDirection()
+	public TpaDirection getDirection()
 	{
 		return direction;
 	}
 	
-	public void setDirection(TpDirection direction)
+	public void setDirection(TpaDirection direction)
 	{
 		this.direction = direction;
 	}
